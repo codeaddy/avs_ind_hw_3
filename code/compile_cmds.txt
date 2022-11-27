@@ -1,0 +1,3 @@
+gcc -O0 -Wall -masm=intel -S -fno-asynchronous-unwind-tables main.c -o main_not_optimized.s -lm
+
+gcc -O2 -Wall -masm=intel -fno-asynchronous-unwind-tables -fcf-protection=none -S main.c -o optimized_commented.s -lm

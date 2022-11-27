@@ -1,0 +1,5 @@
+input data:
+0.50000000
+
+output data:
+0.46368428
