@@ -1,4 +1,4 @@
-	.file	"main_long.c"
+	.file	"main.c"
 	.intel_syntax noprefix
 	.text
 	.p2align 4
@@ -32,10 +32,10 @@ print_double:
 	.globl	process
 	.type	process, @function
 process:
-	movapd	xmm4, xmm0
-	xorpd	xmm4, XMMWORD PTR .LC1[rip]
-	movq	xmm5, QWORD PTR .LC3[rip]
-	pxor	xmm2, xmm2
+	movapd	xmm4, xmm0 						# используем регистры xmm0-xmm6 для сохранения промежуточных вычислений
+	xorpd	xmm4, XMMWORD PTR .LC1[rip]     # кстати, удивительно, что этот метод не вызывается вообще 
+	movq	xmm5, QWORD PTR .LC3[rip] 		# после компиляции с оптимизирующими функциями...
+	pxor	xmm2, xmm2						# (хотя сама программа работает корректно, я компилировал этот ассемблерный файл)
 	movsd	xmm6, QWORD PTR .LC4[rip]
 	addsd	xmm2, xmm0
 	movapd	xmm1, xmm0
@@ -152,7 +152,7 @@ main:
 .L13:
 	xor	edi, edi
 	mov	rbx, rsi
-	lea	r12, .LC9[rip]
+	lea	r12, .LC9[rip] 					# r12 = "-d"
 	call	time@PLT
 	mov	edi, eax
 	call	srand@PLT
@@ -178,30 +178,30 @@ main:
 	lea	rsi, .LC10[rip]
 	mov	rbp, QWORD PTR 24[rbx]
 	call	fopen@PLT
-	mov	r12, rax
+	mov	r12, rax 						# r12 = fopen(file_in, "r")
 	test	rax, rax
 	je	.L34
-	lea	r13, 30[rsp]
+	lea	r13, 30[rsp] 					# r13 = str
 	mov	rdx, rax
 	lea	rsi, 24[rsp]
 	mov	rdi, r13
 	call	read_string
 	mov	rdi, r12
-	mov	r12d, 500000000
+	mov	r12d, 1
 	call	fclose@PLT
 	xor	esi, esi
 	mov	rdi, r13
 	call	strtod@PLT
 	movsd	QWORD PTR [rsp], xmm0
 	call	clock@PLT
-	movsd	xmm0, QWORD PTR [rsp]
+	movsd	xmm0, QWORD PTR [rsp] 		# xmm0 = atof(str)
 	mov	rbx, rax
 .L19:
-	movapd	xmm6, xmm0
-	movapd	xmm10, xmm0
-	pxor	xmm9, xmm9
+	movapd	xmm6, xmm0 					# xmm6 = atof(str)
+	movapd	xmm10, xmm0 				# xmm10 = atof(str)
+	pxor	xmm9, xmm9 					# xmm9 = 0
 	xor	edx, edx
-	xorpd	xmm6, XMMWORD PTR .LC1[rip]
+	xorpd	xmm6, XMMWORD PTR .LC1[rip] # тут что-то странное
 	addsd	xmm9, xmm0
 	movq	xmm7, QWORD PTR .LC3[rip]
 	movapd	xmm8, xmm0
@@ -212,7 +212,7 @@ main:
 	.p2align 4,,10
 	.p2align 3
 .L23:
-	comisd	xmm5, xmm8
+	comisd	xmm5, xmm8 					# выполняем вычисления функции process (она явно не вызывается)
 	movapd	xmm3, xmm9
 	ja	.L24
 	movapd	xmm2, xmm10
@@ -232,7 +232,7 @@ main:
 	jbe	.L21
 .L24:
 	add	edx, 1
-	cmp	edx, r12d
+	cmp	edx, r12d 						# cnt < cycles ?
 	jl	.L23
 .L20:
 	movsd	QWORD PTR 8[rsp], xmm3
@@ -240,7 +240,7 @@ main:
 	call	clock@PLT
 	mov	rdi, rbp
 	lea	rsi, .LC13[rip]
-	mov	r12, rax
+	mov	r12, rax 					# r12 = clock()
 	call	fopen@PLT
 	movsd	xmm0, QWORD PTR [rsp]
 	movsd	xmm3, QWORD PTR 8[rsp]
@@ -253,7 +253,7 @@ main:
 	movsd	QWORD PTR 8[rsp], xmm3
 	lea	rdi, .LC15[rip]
 	movsd	QWORD PTR [rsp], xmm0
-	lea	r13, .LC0[rip]
+	lea	r13, .LC0[rip] 				# r13 = "%0.8f"
 	call	fwrite@PLT
 	movsd	xmm0, QWORD PTR [rsp]
 	mov	rdx, r13
@@ -292,8 +292,8 @@ main:
 	mov	edx, 10
 	call	strtol@PLT
 	mov	rbp, QWORD PTR 24[rbx]
-	mov	r13, rax
-	mov	r12d, eax
+	mov	r13, rax 				# r13 = atoi(argv[2])
+	mov	r12d, eax 				# r12d = atoi(argv[2])
 	call	rand@PLT
 	pxor	xmm0, xmm0
 	cvtsi2sd	xmm0, eax
